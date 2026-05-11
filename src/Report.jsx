@@ -54,12 +54,12 @@ export function Report() {
           </>}
         />
         <main className="content" style={{ background: '#EEF1F5' }} aria-label="Report export for R-2841">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 18 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 18, alignItems: 'start' }}>
 
             {/* PDF preview */}
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', minWidth: 0 }}>
               <article
-                style={{ width: 720, background: '#fff', boxShadow: '0 8px 30px -8px rgba(15,23,42,.18)', borderRadius: 6, overflow: 'hidden' }}
+                style={{ width: '100%', maxWidth: 720, background: '#fff', boxShadow: '0 8px 30px -8px rgba(15,23,42,.18)', borderRadius: 6, overflow: 'hidden' }}
                 aria-label="Report preview"
               >
                 <div style={{ padding: '28px 36px' }}>
@@ -169,7 +169,7 @@ export function Report() {
             </div>
 
             {/* Export panel */}
-            <aside style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <aside style={{ display: 'flex', flexDirection: 'column', gap: 14, width: '100%' }}>
               <div className="card card-pad">
                 <div style={{ fontSize: 13.5, fontWeight: 600, marginBottom: 4 }}>Export options</div>
                 <div style={{ fontSize: 12, color: C.text2, marginBottom: 14 }}>Configure how this report is delivered.</div>
@@ -187,14 +187,14 @@ export function Report() {
                   <Ic.ChevronDown size={14} color={C.text3} />
                 </div>
 
-                <fieldset style={{ border: 'none', margin: 0, padding: 0 }}>
-                  <legend className="label" style={{ float: 'left', width: '100%' }}>Include sections</legend>
+                <div role="group" aria-labelledby="sections-label">
+                  <div id="sections-label" className="label">Include sections</div>
                   {SECTIONS.map(([label, on]) => (
                     <label key={label} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '5px 0', fontSize: 12.5, color: '#374151' }}>
                       <input type="checkbox" defaultChecked={on} /> {label}
                     </label>
                   ))}
-                </fieldset>
+                </div>
               </div>
 
               <div className="card card-pad">

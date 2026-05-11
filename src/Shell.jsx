@@ -120,7 +120,6 @@ export function Topbar({ title, crumb, actions, searchPlaceholder = 'Search by p
         <div className="tb-search-wrap">
           <Ic.Search size={14} aria-hidden="true" />
           <input
-            className=""
             placeholder={searchPlaceholder}
             aria-label={searchPlaceholder}
             type="search"
