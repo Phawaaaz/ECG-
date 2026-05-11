@@ -104,7 +104,7 @@ export function Dashboard() {
           </div>
 
           {/* Stat cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 18 }} role="list" aria-label="Summary statistics">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14, marginBottom: 18 }} role="list" aria-label="Summary statistics">
             {STAT_CARDS.map(s => {
               const IconC = Ic[s.icon];
               return (
