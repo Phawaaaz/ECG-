@@ -59,13 +59,18 @@ html,
 body {
   margin: 0;
   padding: 0;
+  height: 100%;
 }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   color: var(--text);
-  background: #f0eee9;
+  background: var(--bg);
   -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  height: 100%;
 }
 
 .app,
@@ -76,8 +81,8 @@ body {
 }
 
 .screen {
-  width: 1440px;
-  height: 900px;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   position: relative;
 }
@@ -98,8 +103,9 @@ body {
 .app-shell {
   display: grid;
   grid-template-columns: 248px 1fr;
-  grid-template-rows: 64px 1fr;
+  grid-template-rows: 56px 1fr;
   height: 100%;
+  min-height: 0;
   background: var(--bg);
 }
 
@@ -197,6 +203,11 @@ body {
   font-size: 13.5px;
   font-weight: 500;
   cursor: pointer;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  font-family: inherit;
 }
 
 .sb-item:hover { background: #F3F4F6; }
@@ -278,19 +289,23 @@ body {
   border-bottom: 1px solid var(--border-2);
   display: flex;
   align-items: center;
-  padding: 0 28px;
+  padding: 0 24px;
   gap: 16px;
+  min-width: 0;
 }
 
 .tb-title {
   font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.01em;
+  margin: 0;
+  line-height: 1.2;
 }
 
 .tb-crumb {
-  font-size: 12.5px;
+  font-size: 12px;
   color: var(--text-2);
+  margin-bottom: 1px;
 }
 
 .tb-crumb b {
@@ -305,12 +320,20 @@ body {
 
 .tb-search input {
   width: 100%;
-  padding: 8px 10px 8px 32px;
+  padding: 7px 10px 7px 32px;
   border-radius: 8px;
   border: 1px solid var(--border);
   font-size: 13px;
-  background: #FFFFFF;
+  background: #F7F9FC;
   color: var(--text);
+  font-family: inherit;
+}
+
+.tb-search input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
 }
 
 .tb-search input::placeholder { color: var(--text-3); }
@@ -340,6 +363,10 @@ body {
   color: var(--text-2);
   cursor: pointer;
   position: relative;
+  background: none;
+  border: none;
+  font-family: inherit;
+  flex: 0 0 auto;
 }
 
 .tb-ico:hover {
@@ -359,8 +386,21 @@ body {
 }
 
 /* Content area */
-.content      { padding: 24px 28px; overflow: auto; }
-.content-wide { padding: 24px 32px; }
+.content      { padding: 24px 28px; overflow: auto; min-width: 0; min-height: 0; }
+.content-wide { padding: 24px 32px; overflow: auto; min-width: 0; min-height: 0; }
+
+/* Screen-reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
 
 .page-title {
   font-size: 22px;
