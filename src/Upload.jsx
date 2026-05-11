@@ -1,6 +1,7 @@
 import { Icons as Ic } from './Icons.jsx';
 import { Sidebar, Topbar } from './Shell.jsx';
 import { C } from './tokens.js';
+import { useNav } from './NavContext.jsx';
 
 const FILES = [
   { name: 'morgan_eleonor_20260511_0914.xml', size: '1.4 MB', state: 'validated', meta: '12-lead · 10s · Lead II detected' },
@@ -30,6 +31,7 @@ function FileStatusBadge({ state }) {
 }
 
 export function Upload() {
+  const navigate = useNav();
   return (
     <div className="screen">
       <div className="app-shell">
@@ -117,7 +119,7 @@ export function Upload() {
                   <div style={{ fontSize: 12, color: C.text2 }}>3 ready to process · 1 needs review</div>
                   <div className="row gap-2">
                     <button type="button" className="btn btn-ghost btn-sm">Cancel</button>
-                    <button type="button" className="btn btn-primary btn-sm">Process 3 records <Ic.ArrowRight size={13} /></button>
+                    <button type="button" className="btn btn-primary btn-sm" onClick={() => navigate('queue')}>Process 3 records <Ic.ArrowRight size={13} /></button>
                   </div>
                 </div>
               </div>

@@ -2,6 +2,7 @@ import { Icons as Ic } from './Icons.jsx';
 import { EcgMini } from './Ecg.jsx';
 import { Sidebar, Topbar } from './Shell.jsx';
 import { C } from './tokens.js';
+import { useNav } from './NavContext.jsx';
 
 const STAT_CARDS = [
   { label: 'ECGs reviewed',    value: '38',    delta: '+12%',         icon: 'Activity',      color: C.primary,  bg: C.primary50, sub: 'vs. last 24h',      down: false },
@@ -71,6 +72,7 @@ function ThroughputChart() {
 }
 
 export function Dashboard() {
+  const navigate = useNav();
   return (
     <div className="screen">
       <div className="app-shell">
@@ -80,7 +82,7 @@ export function Dashboard() {
           crumb={<span>Mercy West Hospital · <b>Cardiology</b></span>}
           actions={<>
             <button type="button" className="btn btn-secondary btn-sm"><Ic.Calendar size={14} /> Today</button>
-            <button type="button" className="btn btn-primary btn-sm"><Ic.Upload size={14} /> Upload ECG</button>
+            <button type="button" className="btn btn-primary btn-sm" onClick={() => navigate('upload')}><Ic.Upload size={14} /> Upload ECG</button>
           </>}
         />
         <main className="content" aria-label="Dashboard">

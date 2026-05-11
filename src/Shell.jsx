@@ -1,4 +1,5 @@
 import { Icons as Ic } from './Icons.jsx';
+import { useNav } from './NavContext.jsx';
 
 const NAV_ITEMS = [
   { id: 'dashboard',  label: 'Dashboard',        icon: 'Home' },
@@ -16,7 +17,8 @@ const ADMIN_ITEMS = [
   { id: 'settings',     label: 'Settings',      icon: 'Settings' },
 ];
 
-export function Sidebar({ active = 'dashboard', counts = {}, onNavigate }) {
+export function Sidebar({ active = 'dashboard', counts = {} }) {
+  const navigate = useNav();
   return (
     <aside className="sidebar">
       <div className="sb-brand">
@@ -47,7 +49,7 @@ export function Sidebar({ active = 'dashboard', counts = {}, onNavigate }) {
               type="button"
               className={`sb-item${isActive ? ' active' : ''}`}
               aria-current={isActive ? 'page' : undefined}
-              onClick={() => onNavigate?.(item.id)}
+              onClick={() => navigate?.(item.id)}
             >
               <IconC size={16} />
               <span>{item.label}</span>
@@ -70,7 +72,7 @@ export function Sidebar({ active = 'dashboard', counts = {}, onNavigate }) {
               type="button"
               className={`sb-item${isActive ? ' active' : ''}`}
               aria-current={isActive ? 'page' : undefined}
-              onClick={() => onNavigate?.(item.id)}
+              onClick={() => navigate?.(item.id)}
             >
               <IconC size={16} />
               <span>{item.label}</span>
