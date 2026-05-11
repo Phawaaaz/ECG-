@@ -2,30 +2,23 @@ import { useEffect, useRef, useState } from 'react';
 import { animate, stagger } from 'animejs';
 import { Icons as Ic } from './Icons.jsx';
 import { useNav } from './NavContext.jsx';
+import { C } from './tokens.js';
 
-const NAV_LINKS = ['Platform', 'For Hospitals', 'Compliance', 'Pricing'];
+const NAV_LINKS = ['Features', 'Workflow', 'Security', 'Patients', 'Reports'];
 
-const WORKFLOW_STEPS = [
-  { title: 'Upload',      desc: 'CSV, XML, EDF — or direct sync from MUSE / GE / Philips.', icon: 'Upload' },
-  { title: 'Pre-process', desc: 'Noise filtering, lead detection, QRS detection.',          icon: 'Cpu' },
-  { title: 'Classify',    desc: '24 rhythm classes with interval measurements.',            icon: 'Brain' },
-  { title: 'Sign & file', desc: 'Structured report, audit-trailed e-signature.',           icon: 'ClipboardCheck' },
+const FEATURES_DATA = [
+  { icon: 'Upload', title: 'Secure ECG Uploads', desc: 'Upload single recordings or batch files in XML, EDF, CSV, and HL7 formats. Encrypted in transit and at rest.', color: C.primary },
+  { icon: 'Brain', title: 'AI-Assisted Analysis', desc: 'Rhythm classification, interval measurements, and morphology flags. AI suggests — clinicians decide.', color: C.teal },
+  { icon: 'FileText', title: 'Clinical Reporting', desc: 'Structured reports with patient summary, findings, measurements, and interpretation. Export as PDF or HL7.', color: C.primary },
+  { icon: 'Users', title: 'Patient Management', desc: 'Search by name, MRN, or date. Filter by status, risk level, or date range. Full audit trail on every view.', color: C.teal },
+  { icon: 'Zap', title: 'Fast Processing', desc: 'Average 38 seconds from upload to first interpretation. Parallel processing for batch uploads.', color: C.primary },
+  { icon: 'Folder', title: 'Multi-File Support', desc: 'XML, EDF, CSV, SCP-ECG, HL7 v2, FHIR. Direct sync from MUSE, GE MUSE, and Philips TraceMaster.', color: C.teal },
 ];
 
-const FEATURES = [
-  { title: 'Structured interpretation', desc: 'Intervals, axis, and rhythm classification land in your EHR as discrete fields — not free text.', icon: 'FileText' },
-  { title: 'Built-in audit trail',      desc: 'Every view, every signature, every export is logged with user, time, and IP.',                   icon: 'ClipboardCheck' },
-  { title: 'Hospital-grade security',   desc: 'NAFDAC compliant, NDIC-aligned. Single-tenant deployment on request.',                           icon: 'ShieldCheck' },
-  { title: 'HL7 & FHIR integration',    desc: 'Drop-in connectors for Epic, Cerner and major MUSE / GE / Philips devices.',           icon: 'Layers' },
-  { title: 'Sub-minute turnaround',     desc: 'Average time from upload to first interpretation: 38 seconds.',                                   icon: 'Zap' },
-  { title: 'Clinician in the loop',     desc: 'AI suggests. A licensed cardiologist signs. Decision support, never decision making.',            icon: 'Stethoscope' },
-];
-
-const STATS_DATA = [
-  { value: '1.8M',  label: 'ECGs analyzed across Nigeria' },
-  { value: '97.8%', label: 'Rhythm classification accuracy' },
-  { value: '38s',   label: 'Avg. time to first interpretation' },
-  { value: '18',    label: 'Hospitals & cardiology groups' },
+const TESTIMONIALS = [
+  { quote: 'We reduced average ECG review time by 60% without changing our clinical workflow. The audit trail made NAFDAC compliance straightforward.', name: 'Dr. D. Adekunle', role: 'Chief of Cardiology', org: 'LUTH, Lagos' },
+  { quote: 'Deployment took two days. Our technicians were uploading ECGs within the hour. The AI suggestions are remarkably accurate.', name: 'Dr. F. Ogunlesi', role: 'Head of Clinical Services', org: 'UCH, Ibadan' },
+  { quote: 'We process over 200 ECGs daily. The queue management and batch processing alone saved us hours. The reporting is exceptional.', name: 'Dr. A. Bello', role: 'Medical Director', org: 'National Hospital, Abuja' },
 ];
 
 function useViewAnimation(ref, fn) {
@@ -33,288 +26,555 @@ function useViewAnimation(ref, fn) {
     const el = ref.current;
     if (!el) return;
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        fn();
-        observer.unobserve(el);
-      }
-    }, { threshold: 0.15 });
+      if (entry.isIntersecting) { fn(); observer.unobserve(el); }
+    }, { threshold: 0.12 });
     observer.observe(el);
     return () => observer.disconnect();
   }, [ref, fn]);
+}
+
+function SectionLabel({ children }) {
+  return <p className="sec-label" style={{ fontSize: 12, color: C.primary, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', margin: '0 0 10px' }}>{children}</p>;
+}
+
+function Badge({ label, variant }) {
+  const m = { green: { bg: '#ECFDF3', c: '#15803D' }, amber: { bg: '#FFFAEB', c: '#B45309' }, blue: { bg: '#EFF6FF', c: '#1D4ED8' }, red: { bg: '#FEF2F2', c: '#B91C1C' }, slate: { bg: '#F3F4F6', c: '#374151' } };
+  const s = m[variant] || m.slate;
+  return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '2px 8px', borderRadius: 999, fontSize: 11, fontWeight: 550, background: s.bg, color: s.c }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: s.c }} />{label}</span>;
+}
+
+function Avatar({ initials, size = 28, bg = '#EFF6FF', color = C.primary700 }) {
+  return <div style={{ width: size, height: size, borderRadius: '50%', background: bg, color, display: 'grid', placeItems: 'center', fontSize: size * 0.38, fontWeight: 600, flexShrink: 0 }}>{initials}</div>;
+}
+
+/* ── Dashboard Preview Components (no ECG waves) ── */
+
+function UploadPreview() {
+  return (
+    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.borderSoft}`, padding: 18, boxShadow: C.shadowSm, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontSize: 13, fontWeight: 600 }}>Upload ECG</div>
+        <Badge label="XML · 12-lead" variant="blue" />
+      </div>
+      <div style={{ border: `1.5px dashed ${C.border}`, borderRadius: 10, padding: '24px 16px', textAlign: 'center', background: '#FAFBFC' }}>
+        <Ic.Upload size={20} color={C.text3} />
+        <div style={{ fontSize: 12, color: C.text3, marginTop: 6 }}>Drop files or click to browse</div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', background: C.bg, borderRadius: 8 }}>
+        <div style={{ width: 28, height: 28, borderRadius: 6, background: C.primary50, display: 'grid', placeItems: 'center' }}><Ic.FileText size={13} color={C.primary} /></div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 12, fontWeight: 600 }}>ecg_12lead_00482.xml</div>
+          <div style={{ fontSize: 10.5, color: C.text3 }}>2.4 MB · 12 leads</div>
+        </div>
+        <Badge label="Uploaded" variant="green" />
+      </div>
+    </div>
+  );
+}
+
+function PatientSummaryPreview() {
+  return (
+    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.borderSoft}`, padding: 18, boxShadow: C.shadowSm, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ fontSize: 13, fontWeight: 600 }}>Patient Summary</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <Avatar initials="EM" size={36} />
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 600 }}>Eleanor Morgan</div>
+          <div style={{ fontSize: 11.5, color: C.text3 }}>MRN: 00482-913 · 64F</div>
+        </div>
+        <Badge label="Review" variant="amber" />
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+        {[{ l: 'Heart Rate', v: '72 bpm' }, { l: 'QRS', v: '104 ms' }, { l: 'QTc', v: '428 ms' }, { l: 'Axis', v: '+62°' }].map(d => (
+          <div key={d.l} style={{ background: C.bg, borderRadius: 8, padding: '8px 10px' }}>
+            <div style={{ fontSize: 10.5, color: C.text3, marginBottom: 2 }}>{d.l}</div>
+            <div style={{ fontSize: 13, fontWeight: 600 }}>{d.v}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ReportSummaryPreview() {
+  return (
+    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.borderSoft}`, padding: 18, boxShadow: C.shadowSm, display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontSize: 13, fontWeight: 600 }}>Report · R-2841</div>
+        <Badge label="Final" variant="blue" />
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <Avatar initials="DA" size={24} bg={C.primary50} color={C.primary} />
+        <div style={{ fontSize: 12, color: C.text2, lineHeight: 1.5 }}>
+          <span style={{ fontWeight: 600, color: C.text }}>Dr. Adekunle</span> — Normal sinus rhythm. No significant abnormalities detected.
+        </div>
+      </div>
+      <div style={{ fontSize: 10.5, color: C.text3 }}>Signed: Today, 09:14 AM</div>
+    </div>
+  );
+}
+
+function StatusRow() {
+  return (
+    <div style={{ display: 'flex', gap: 8 }}>
+      <Badge label="12 ECGs today" variant="blue" />
+      <Badge label="2 flagged" variant="red" />
+      <Badge label="38s avg" variant="green" />
+    </div>
+  );
+}
+
+function PatientTablePreview() {
+  const rows = [
+    { name: 'Eleanor Morgan', mrn: '00482-913', time: '09:14', finding: 'Normal sinus rhythm', status: 'review', conf: 97 },
+    { name: 'James Whitfield', mrn: '00318-220', time: '08:52', finding: 'Sinus bradycardia', status: 'normal', conf: 94 },
+    { name: 'Aiko Tanaka', mrn: '00591-014', time: '08:39', finding: 'AFib detected', status: 'urgent', conf: 91 },
+    { name: 'Marcus Ellington', mrn: '00427-771', time: '08:21', finding: 'LVH criteria met', status: 'review', conf: 88 },
+  ];
+  return (
+    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.borderSoft}`, boxShadow: C.shadowSm, overflow: 'hidden' }}>
+      <div style={{ padding: '14px 18px', borderBottom: `1px solid ${C.borderSoft}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontSize: 13, fontWeight: 600 }}>Recent ECGs</div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', background: C.bg, borderRadius: 6, fontSize: 11, color: C.text2 }}><Ic.Search size={11} />Search</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', background: C.bg, borderRadius: 6, fontSize: 11, color: C.text2 }}><Ic.Filter size={11} />Filter</div>
+        </div>
+      </div>
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+          <thead>
+            <tr style={{ background: C.bg }}>
+              {['Patient', 'Time', 'Finding', 'Status'].map(h => <th key={h} style={{ textAlign: 'left', padding: '8px 14px', fontWeight: 600, color: C.text3, fontSize: 10.5, textTransform: 'uppercase', letterSpacing: '.04em' }}>{h}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(r => (
+              <tr key={r.mrn} style={{ borderTop: `1px solid ${C.borderSoft}` }}>
+                <td style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Avatar initials={r.name.split(' ').map(x => x[0]).join('')} size={26} />
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: 12 }}>{r.name}</div>
+                    <div style={{ fontSize: 10.5, color: C.text3 }}>{r.mrn}</div>
+                  </div>
+                </td>
+                <td style={{ padding: '10px 14px', color: C.text3, fontSize: 11.5 }}>{r.time}</td>
+                <td style={{ padding: '10px 14px' }}><div style={{ fontWeight: 550 }}>{r.finding}</div><div style={{ fontSize: 10.5, color: C.text3 }}>{r.conf}% confidence</div></td>
+                <td style={{ padding: '10px 14px' }}><Badge label={r.status} variant={r.status === 'urgent' ? 'red' : r.status === 'review' ? 'amber' : 'green'} /></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function ProcessingTimeline() {
+  return (
+    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.borderSoft}`, padding: 18, boxShadow: C.shadowSm }}>
+      <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 14 }}>Processing Status</div>
+      {[{ label: 'Upload Received', time: '08:39 AM', done: true }, { label: 'Noise Filtering', time: '08:40 AM', done: true }, { label: 'QRS Detection', time: '08:41 AM', done: true }, { label: 'Rhythm Classification', time: '08:42 AM', pct: 72 }, { label: 'Report Generation', time: 'Pending', pct: 0 }].map((s, i) => (
+        <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0', borderTop: i === 0 ? 'none' : `1px solid ${C.borderSoft}` }}>
+          <div style={{ width: 18, height: 18, borderRadius: '50%', background: s.done ? '#ECFDF3' : s.pct >= 0 ? C.primary50 : C.bg, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+            {s.done ? <Ic.Check size={10} color="#15803D" /> : <div style={{ width: 6, height: 6, borderRadius: '50%', background: s.pct ? C.primary : C.text3 }} />}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 12, fontWeight: 550 }}>{s.label}</div>
+            <div style={{ fontSize: 10.5, color: C.text3 }}>{s.time}{s.pct ? ` · ${s.pct}%` : ''}</div>
+          </div>
+          {s.done && <Ic.CheckCircle size={14} color="#15803D" />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ClinicalReportPreview() {
+  return (
+    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.borderSoft}`, padding: 22, boxShadow: C.shadowSm, maxWidth: 480 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, paddingBottom: 14, borderBottom: `1px solid ${C.borderSoft}` }}>
+        <div>
+          <div style={{ fontSize: 10.5, color: C.text3, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 2 }}>CardioEcg · Clinical Report</div>
+          <div style={{ fontSize: 16, fontWeight: 650 }}>R-2841</div>
+        </div>
+        <Badge label="Signed" variant="green" />
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+        {[{ l: 'Patient', v: 'Eleanor Morgan' }, { l: 'MRN', v: '00482-913' }, { l: 'Age / Sex', v: '64 / Female' }, { l: 'Recorded', v: 'Today, 08:39 AM' }].map(d => (
+          <div key={d.l}><div style={{ fontSize: 10.5, color: C.text3, marginBottom: 1 }}>{d.l}</div><div style={{ fontSize: 12.5, fontWeight: 550 }}>{d.v}</div></div>
+        ))}
+      </div>
+      <div style={{ padding: 12, background: C.bg, borderRadius: 8, marginBottom: 14 }}>
+        <div style={{ fontSize: 10.5, color: C.text3, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 4 }}>Interpretation</div>
+        <div style={{ fontSize: 12.5, lineHeight: 1.6 }}>Normal sinus rhythm at 72 bpm. Normal PR interval, QRS duration, and QTc. No ST-segment or T-wave abnormalities. Normal axis.</div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 12, borderTop: `1px solid ${C.borderSoft}` }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Avatar initials="DA" size={22} bg={C.primary50} color={C.primary} />
+          <div style={{ fontSize: 11.5, color: C.text2 }}>Signed by <span style={{ fontWeight: 600, color: C.text }}>Dr. D. Adekunle</span></div>
+        </div>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <div style={{ padding: '5px 10px', borderRadius: 6, border: `1px solid ${C.border}`, fontSize: 11, color: C.text2, cursor: 'pointer' }}>Export PDF</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SecurityCard({ icon: Icon, title, desc }) {
+  return (
+    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.borderSoft}`, padding: 22, boxShadow: C.shadowSm }}>
+      <div style={{ width: 34, height: 34, borderRadius: 9, background: C.primary50, display: 'grid', placeItems: 'center', color: C.primary, marginBottom: 12 }}><Icon size={16} /></div>
+      <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{title}</div>
+      <div style={{ fontSize: 12.5, color: C.text2, lineHeight: 1.6 }}>{desc}</div>
+    </div>
+  );
 }
 
 export function Landing() {
   const navigate = useNav();
   const [sticky, setSticky] = useState(false);
   const heroRef = useRef(null);
-  const workflowRef = useRef(null);
   const featuresRef = useRef(null);
-  const statsRef = useRef(null);
-  const ctaRef = useRef(null);
+  const workflowRef = useRef(null);
+  const securityRef = useRef(null);
+  const patientsRef = useRef(null);
+  const reportsRef = useRef(null);
+  const testimonialsRef = useRef(null);
 
   useEffect(() => {
-    animate('.hero-fade', {
-      translateY: [30, 0],
-      opacity: [0, 1],
-      duration: 600,
-      delay: stagger(100),
-      easing: 'easeOutCubic',
-    });
-    animate('.hero-btn', {
-      translateY: [15, 0],
-      opacity: [0, 1],
-      duration: 400,
-      delay: stagger(80),
-      easing: 'easeOutCubic',
-    });
+    animate('.hero-fade', { translateY: [20, 0], opacity: [0, 1], duration: 500, delay: stagger(100), easing: 'easeOutCubic' });
   }, []);
 
-  /* ── Header becomes sticky when hero scrolls past ── */
   useEffect(() => {
     const el = heroRef.current;
     if (!el) return;
-    const observer = new IntersectionObserver(
-      ([e]) => setSticky(!e.isIntersecting),
-      { threshold: 0 }
-    );
+    const observer = new IntersectionObserver(([e]) => setSticky(!e.isIntersecting), { threshold: 0 });
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
-  useViewAnimation(workflowRef, () => {
-    animate('.workflow-item', { opacity: [0, 1], translateY: [24, 0], duration: 500, delay: stagger(90), easing: 'easeOutCubic' });
-  });
-
-  useViewAnimation(featuresRef, () => {
-    animate('.feature-item', { opacity: [0, 1], translateY: [24, 0], duration: 500, delay: stagger(70), easing: 'easeOutCubic' });
-  });
-
-  useViewAnimation(statsRef, () => {
-    animate('.stat-item', { opacity: [0, 1], translateY: [16, 0], duration: 400, delay: stagger(90), easing: 'easeOutCubic' });
-    animate('.stat-value', { scale: [0.85, 1], duration: 700, delay: stagger(90), easing: 'easeOutElastic(1, .5)' });
-  });
-
-  useViewAnimation(ctaRef, () => {
-    animate('.cta-content', { opacity: [0, 1], translateY: [20, 0], duration: 500, easing: 'easeOutCubic' });
-  });
+  useViewAnimation(featuresRef, () => animate('.feature-item', { opacity: [0, 1], translateY: [16, 0], duration: 400, delay: stagger(70), easing: 'easeOutCubic' }));
+  useViewAnimation(workflowRef, () => animate('.workflow-item', { opacity: [0, 1], translateY: [16, 0], duration: 400, delay: stagger(80), easing: 'easeOutCubic' }));
+  useViewAnimation(securityRef, () => animate('.security-item', { opacity: [0, 1], translateY: [16, 0], duration: 400, delay: stagger(70), easing: 'easeOutCubic' }));
+  useViewAnimation(patientsRef, () => animate('.patients-view', { opacity: [0, 1], translateY: [16, 0], duration: 500, easing: 'easeOutCubic' }));
+  useViewAnimation(reportsRef, () => animate('.reports-view', { opacity: [0, 1], translateY: [16, 0], duration: 500, easing: 'easeOutCubic' }));
+  useViewAnimation(testimonialsRef, () => animate('.testimonial-item', { opacity: [0, 1], translateY: [16, 0], duration: 400, delay: stagger(80), easing: 'easeOutCubic' }));
 
   return (
-    <div style={{ fontFamily: 'Inter, system-ui, sans-serif', color: '#111827' }}>
+    <div style={{ fontFamily: 'Inter, system-ui, sans-serif', color: C.text, background: C.bg }}>
+      <style>{`
+        .lp-hdr { padding: 14px 48px; }
+        .lp-sec { padding: 96px 48px; }
+        .lp-sec-sm { padding: 72px 48px; }
+        .cp { box-sizing: border-box; }
+        @media (max-width: 1024px) {
+          .lp-hdr { padding: 14px 24px; }
+          .lp-sec { padding: 64px 24px; }
+          .lp-sec-sm { padding: 48px 24px; }
+          .lp-hero-grid { grid-template-columns: 1fr; gap: 40px; }
+          .lp-hero-right > div { max-width: 100%; }
+        }
+        @media (max-width: 768px) {
+          .lp-hdr { padding: 12px 20px; }
+          .lp-sec { padding: 48px 20px; }
+          .lp-sec-sm { padding: 40px 20px; }
+          .lp-nav { display: none; }
+          .lp-hero-grid { gap: 32px; }
+          .lp-hero { min-height: 0; padding: 48px 20px 40px; }
+          .lp-clin-report { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+          .lp-hdr { padding: 10px 16px; }
+          .lp-sec { padding: 36px 16px; }
+          .lp-sec-sm { padding: 28px 16px; }
+          .lp-hero { min-height: 0; padding: 36px 16px 28px; }
+        }
+      `}</style>
 
-      <header style={{
-        display: 'flex', alignItems: 'center', padding: '18px 48px',
-        position: 'sticky', top: 0, zIndex: 50, transition: '.2s',
-        background: sticky ? '#fff' : 'transparent',
-        borderBottom: sticky ? '1px solid #eee' : '1px solid transparent',
+      {/* ── Navbar ── */}
+      <header className="lp-hdr" style={{
+        display: 'flex', alignItems: 'center', position: 'sticky', top: 0, zIndex: 50, transition: '.2s',
+        background: sticky ? 'rgba(255,255,255,.95)' : 'transparent',
+        backdropFilter: sticky ? 'blur(10px)' : 'none',
+        borderBottom: sticky ? `1px solid ${C.borderSoft}` : '1px solid transparent',
       }}>
         <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: 'inherit' }} aria-label="CardioEcg home">
-          <Ic.Logo size={22} />
+          <Ic.Logo size={24} />
           <span style={{ fontWeight: 650, fontSize: 14, letterSpacing: '-0.01em' }}>CardioEcg</span>
         </a>
-        <nav style={{ display: 'flex', gap: 24, marginLeft: 48 }} aria-label="Site navigation">
+        <nav className="lp-nav" style={{ display: 'flex', gap: 24, marginLeft: 44 }} aria-label="Site navigation">
           {NAV_LINKS.map(link => (
-            <a key={link} href={`#${link.toLowerCase().replace(/ /g, '-')}`} style={{
-              fontSize: 13, color: '#374151', textDecoration: 'none', fontWeight: 500,
-            }}>{link}</a>
+            <a key={link} href={`#${link.toLowerCase()}`} style={{ fontSize: 13, color: C.text2, textDecoration: 'none', fontWeight: 500, transition: 'color .15s' }}
+              onMouseEnter={e => e.currentTarget.style.color = C.text}
+              onMouseLeave={e => e.currentTarget.style.color = C.text2}>{link}</a>
           ))}
         </nav>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 10, alignItems: 'center' }}>
           <button type="button" onClick={() => navigate('login')} style={{
-            fontSize: 13, color: '#374151', fontWeight: 500, background: 'none',
-            border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: '6px 10px',
-          }}>
+            fontSize: 13, color: C.text2, fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: '6px 12px', transition: 'color .15s',
+          }}
+            onMouseEnter={e => e.currentTarget.style.color = C.text}
+            onMouseLeave={e => e.currentTarget.style.color = C.text2}>
             Sign in
           </button>
-          <button type="button" className="btn btn-primary btn-sm" onClick={() => navigate('login')}>Book a demo</button>
+          <button type="button" onClick={() => navigate('login')} style={{
+            padding: '7px 14px', borderRadius: 8, fontSize: 13, fontWeight: 550, fontFamily: 'inherit', border: 'none', cursor: 'pointer', lineHeight: 1,
+            background: C.primary, color: '#fff', boxShadow: '0 1px 2px rgba(37,99,235,.2)',
+          }}
+            onMouseEnter={e => e.currentTarget.style.background = C.primary700}
+            onMouseLeave={e => e.currentTarget.style.background = C.primary}>
+            Get Started
+          </button>
         </div>
       </header>
 
       <main>
         {/* ── Hero ── */}
-        <section ref={heroRef} aria-labelledby="hero-heading" style={{
-          padding: '100px 48px 80px', textAlign: 'center',
-          background: '#F8FAFC',
-        }}>
-          <div className="hero-fade" style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 12px 4px 6px',
-            background: '#fff', borderRadius: 999, fontSize: 12, color: '#475569', fontWeight: 500,
-            marginBottom: 24, boxShadow: '0 1px 2px rgba(0,0,0,.04), 0 0 0 1px rgba(0,0,0,.04)',
-          }}>
-            <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#16A34A', display: 'inline-block' }} aria-hidden="true" />
-            NAFDAC cleared · NLoN compliant
+        <section ref={heroRef} aria-labelledby="hero-heading" className="lp-hero" style={{ minHeight: '90vh', display: 'flex', alignItems: 'center', padding: '0 48px' }}>
+          <div className="lp-hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center', maxWidth: 1200, margin: '0 auto', width: '100%' }}>
+            <div>
+              <SectionLabel>CardioEcg Platform</SectionLabel>
+              <h1 id="hero-heading" className="hero-fade" style={{ fontSize: 'clamp(32px, 3.5vw, 44px)', lineHeight: 1.1, letterSpacing: '-0.03em', fontWeight: 700, margin: '0 0 16px', color: C.text }}>
+                AI-Assisted ECG Analysis<br />for Faster Clinical Review
+              </h1>
+              <p className="hero-fade" style={{ fontSize: 15, color: C.text2, lineHeight: 1.65, margin: '0 0 28px', maxWidth: 460 }}>
+                Upload, process, and interpret ECGs in under a minute. Built for hospital cardiology departments — from LUTH to UCH.
+              </p>
+              <div className="hero-fade" style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 28 }}>
+                <button type="button" onClick={() => navigate('login')} style={{
+                  padding: '11px 20px', borderRadius: 9, fontSize: 14, fontWeight: 550, fontFamily: 'inherit', border: 'none', cursor: 'pointer', lineHeight: 1,
+                  background: C.primary, color: '#fff', boxShadow: '0 1px 2px rgba(37,99,235,.25)',
+                }}
+                  onMouseEnter={e => e.currentTarget.style.background = C.primary700}
+                  onMouseLeave={e => e.currentTarget.style.background = C.primary}>
+                  Book a Demo
+                </button>
+                <button type="button" onClick={() => navigate('login')} style={{
+                  padding: '11px 20px', borderRadius: 9, fontSize: 14, fontWeight: 550, fontFamily: 'inherit', cursor: 'pointer', lineHeight: 1,
+                  background: '#fff', color: C.text, border: `1px solid ${C.border}`,
+                }}
+                  onMouseEnter={e => e.currentTarget.style.background = C.bg}
+                  onMouseLeave={e => e.currentTarget.style.background = '#fff'}>
+                  View Sample Report
+                </button>
+              </div>
+              <div className="hero-fade" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+                <Badge label="NAFDAC Cleared" variant="green" />
+                <Badge label="NLoN Compliant" variant="blue" />
+                <Badge label="SOC 2 Type II" variant="slate" />
+              </div>
+            </div>
+            <div className="lp-hero-right" style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 540 }}>
+              <StatusRow />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <UploadPreview />
+                <PatientSummaryPreview />
+              </div>
+              <ReportSummaryPreview />
+            </div>
           </div>
-          <h1 id="hero-heading" className="hero-fade" style={{
-            fontSize: 'clamp(32px, 4.5vw, 50px)', lineHeight: 1.08, letterSpacing: '-0.03em',
-            fontWeight: 700, margin: '0 0 14px', color: '#0F172A',
-          }}>
-            ECG analysis for<br />Nigerian hospitals.
-          </h1>
-          <p className="hero-fade" style={{
-            fontSize: 15, color: '#6B7280', lineHeight: 1.6, margin: '0 auto 28px', maxWidth: 480,
-          }}>
-            From LUTH to UCH — clinical-grade cardiac interpretation
-            built for the way your team works.
-          </p>
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button type="button" className="btn btn-primary btn-lg hero-btn" onClick={() => navigate('login')}>Book a demo</button>
-            <button type="button" className="btn btn-secondary btn-lg hero-btn" onClick={() => navigate('login')}>View sample report</button>
-          </div>
-        </section>
-
-        {/* ── How it works ── */}
-        <section ref={workflowRef} id="platform" aria-labelledby="workflow-heading" style={{
-          padding: '80px 48px', background: '#fff',
-        }}>
-          <div style={{ textAlign: 'center', maxWidth: 520, margin: '0 auto 48px' }}>
-            <h2 id="workflow-heading" style={{
-              fontSize: 'clamp(24px, 2.5vw, 32px)', letterSpacing: '-0.02em',
-              margin: '0 0 10px', fontWeight: 700, color: '#0F172A',
-            }}>
-              Four steps. No new workflow.
-            </h2>
-            <p style={{ fontSize: 14, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>
-              CardioEcg sits between your devices and your HMS/EHR.
-            </p>
-          </div>
-          <ol style={{
-            display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: 14, maxWidth: 1000, margin: '0 auto', listStyle: 'none', padding: 0,
-          }}>
-            {WORKFLOW_STEPS.map(({ title, desc, icon }, i) => {
-              const IconC = Ic[icon];
-              return (
-                <li key={title} className="workflow-item" style={{
-                  padding: '28px 22px', borderRadius: 10, border: '1px solid #eee',
-                  background: '#fff', opacity: 0,
-                }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 7, background: '#EFF6FF', display: 'grid', placeItems: 'center', color: '#2563EB', marginBottom: 12 }}>
-                    <IconC size={15} />
-                  </div>
-                  <p style={{ fontSize: 10.5, color: '#9CA3AF', fontWeight: 600, marginBottom: 3, marginTop: 0 }}>0{i + 1}</p>
-                  <h3 style={{ fontSize: 14, margin: '0 0 3px', fontWeight: 600, color: '#0F172A' }}>{title}</h3>
-                  <p style={{ fontSize: 12.5, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>{desc}</p>
-                </li>
-              );
-            })}
-          </ol>
         </section>
 
         {/* ── Features ── */}
-        <section ref={featuresRef} id="for-hospitals" aria-labelledby="features-heading" style={{
-          padding: '80px 48px', background: '#F8FAFC',
-        }}>
-          <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-            <h2 id="features-heading" style={{
-              fontSize: 'clamp(24px, 2.5vw, 32px)', letterSpacing: '-0.02em',
-              margin: '0 0 8px', fontWeight: 700, color: '#0F172A',
-            }}>
-              Built for Nigerian clinicians.
-            </h2>
-            <p style={{ fontSize: 14, color: '#6B7280', margin: '0 0 36px', maxWidth: 500, lineHeight: 1.6 }}>
-              Every decision is auditable. Every record stays in your tenant — NAFDAC and NLoN compliant.
-            </p>
-            <ul style={{
-              display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-              gap: 14, listStyle: 'none', padding: 0, margin: 0,
-            }}>
-              {FEATURES.map(({ title, desc, icon }) => {
+        <section ref={featuresRef} id="features" aria-labelledby="features-heading" className="lp-sec" style={{ background: '#fff' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 56 }}>
+              <SectionLabel>Platform Features</SectionLabel>
+              <h2 id="features-heading" style={{ fontSize: 'clamp(26px, 2.8vw, 34px)', letterSpacing: '-0.025em', fontWeight: 700, margin: '0 0 12px', color: C.text }}>
+                Everything you need for clinical ECG analysis
+              </h2>
+              <p style={{ fontSize: 14.5, color: C.text2, maxWidth: 560, margin: '0 auto', lineHeight: 1.65 }}>
+                From upload to signed report — a complete workflow designed for hospital cardiology teams.
+              </p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+              {FEATURES_DATA.map(({ icon, title, desc, color }) => {
                 const IconC = Ic[icon];
                 return (
-                  <li key={title} className="feature-item" style={{
-                    background: '#fff', padding: '22px', borderRadius: 10,
-                    border: '1px solid #eee', opacity: 0,
-                  }}>
-                    <div style={{ width: 30, height: 30, borderRadius: 7, background: '#EFF6FF', display: 'grid', placeItems: 'center', color: '#2563EB', marginBottom: 10 }}>
-                      <IconC size={14} />
+                  <div key={title} className="feature-item" style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.borderSoft}`, padding: 24, boxShadow: C.shadowSm, opacity: 0 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: 9, background: `${color}10`, display: 'grid', placeItems: 'center', color, marginBottom: 12 }}>
+                      <IconC size={17} />
                     </div>
-                    <h3 style={{ fontSize: 13.5, margin: '0 0 3px', fontWeight: 600, color: '#0F172A' }}>{title}</h3>
-                    <p style={{ fontSize: 12.5, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>{desc}</p>
-                  </li>
+                    <h3 style={{ fontSize: 14.5, fontWeight: 600, margin: '0 0 6px', color: C.text }}>{title}</h3>
+                    <p style={{ fontSize: 13, color: C.text2, margin: 0, lineHeight: 1.6 }}>{desc}</p>
+                  </div>
                 );
               })}
-            </ul>
+            </div>
           </div>
         </section>
 
-        {/* ── Stats ── */}
-        <section ref={statsRef} aria-label="Platform statistics" style={{ padding: '64px 48px', background: '#fff' }}>
-          <ul style={{
-            display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-            gap: 20, maxWidth: 900, margin: '0 auto', listStyle: 'none', padding: 0,
-          }}>
-            {STATS_DATA.map(({ value, label }) => (
-              <li key={label} className="stat-item" style={{
-                textAlign: 'center', padding: '24px 14px', background: '#F8FAFC',
-                borderRadius: 10, border: '1px solid #eee', opacity: 0,
-              }}>
-                <div className="stat-value" style={{
-                  fontSize: 'clamp(28px, 3vw, 36px)', fontWeight: 700,
-                  letterSpacing: '-0.025em', color: '#2563EB', marginBottom: 4,
-                }}>
-                  {value}
+        {/* ── Workflow ── */}
+        <section ref={workflowRef} id="workflow" aria-labelledby="workflow-heading" className="lp-sec">
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 56 }}>
+              <SectionLabel>How It Works</SectionLabel>
+              <h2 id="workflow-heading" style={{ fontSize: 'clamp(26px, 2.8vw, 34px)', letterSpacing: '-0.025em', fontWeight: 700, margin: '0 0 12px', color: C.text }}>
+                Three steps to a signed report
+              </h2>
+              <p style={{ fontSize: 14.5, color: C.text2, maxWidth: 500, margin: '0 auto', lineHeight: 1.65 }}>
+                No new hardware. No complex setup. Your team works the way they always have.
+              </p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+              {[
+                { step: '01', title: 'Upload ECG Files', desc: 'Drag and drop XML, EDF, CSV files or sync directly from MUSE, GE, and Philips devices. Encrypted upload with instant validation.', preview: <div style={{ display: 'flex', gap: 8 }}><Badge label="XML" variant="blue" /><Badge label="EDF" variant="blue" /><Badge label="CSV" variant="blue" /><Badge label="HL7" variant="blue" /></div> },
+                { step: '02', title: 'AI Processing', desc: 'Noise filtering, lead detection, QRS identification, and rhythm classification. Average processing time: 38 seconds.', preview: <div style={{ width: '100%', height: 6, background: C.bg, borderRadius: 999, overflow: 'hidden' }}><div style={{ width: '72%', height: '100%', background: C.primary, borderRadius: 999 }} /></div> },
+                { step: '03', title: 'Clinical Review', desc: 'AI-generated interpretation reviewed and signed by a licensed cardiologist. Structured report with full audit trail.', preview: <div style={{ display: 'flex', gap: 8 }}><Badge label="Review" variant="amber" /><Badge label="Sign" variant="green" /><Badge label="Archive" variant="slate" /></div> },
+              ].map((s, i) => (
+                <div key={s.step} className="workflow-item" style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.borderSoft}`, padding: 28, boxShadow: C.shadowSm, opacity: 0 }}>
+                  <div style={{ fontSize: 28, fontWeight: 700, color: C.primary50, lineHeight: 1, marginBottom: 14 }}>{s.step}</div>
+                  <h3 style={{ fontSize: 16, fontWeight: 600, margin: '0 0 8px' }}>{s.title}</h3>
+                  <p style={{ fontSize: 13, color: C.text2, margin: '0 0 16px', lineHeight: 1.6 }}>{s.desc}</p>
+                  {s.preview}
                 </div>
-                <div style={{ fontSize: 12.5, color: '#6B7280', lineHeight: 1.4 }}>{label}</div>
-              </li>
-            ))}
-          </ul>
+              ))}
+            </div>
+            <div style={{ marginTop: 48, maxWidth: 480 }}>
+              <ProcessingTimeline />
+            </div>
+          </div>
         </section>
 
-        {/* ── CTA ── */}
-        <section ref={ctaRef} aria-labelledby="cta-heading" style={{
-          padding: '80px 48px', background: '#0F172A',
-        }}>
-          <div className="cta-content" style={{ textAlign: 'center', maxWidth: 520, margin: '0 auto', opacity: 0 }}>
-            <h2 id="cta-heading" style={{
-              fontSize: 'clamp(24px, 2.5vw, 32px)', letterSpacing: '-0.02em',
-              margin: '0 0 10px', fontWeight: 700, color: '#fff',
-            }}>
-              Try it on your own data.
-            </h2>
-            <p style={{
-              fontSize: 14, color: '#94A3B8', margin: '0 0 28px', lineHeight: 1.6,
-            }}>
-              30-minute walkthrough with a de-identified sample of your hospital&rsquo;s recordings. No commitment.
-            </p>
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button type="button" onClick={() => navigate('login')} style={{
-                padding: '11px 24px', borderRadius: 8, fontSize: 14, fontWeight: 550,
-                fontFamily: 'inherit', border: 'none', cursor: 'pointer', lineHeight: 1,
-                background: '#2563EB', color: '#fff',
-              }}
-                onMouseEnter={e => e.currentTarget.style.background = '#1D4ED8'}
-                onMouseLeave={e => e.currentTarget.style.background = '#2563EB'}>
-                Book a demo
-              </button>
-              <button type="button" onClick={() => navigate('login')} style={{
-                padding: '11px 24px', borderRadius: 8, fontSize: 14, fontWeight: 550,
-                fontFamily: 'inherit', cursor: 'pointer', lineHeight: 1,
-                background: '#fff', color: '#0F172A', border: 'none',
-              }}
-                onMouseEnter={e => e.currentTarget.style.background = '#F1F5F9'}
-                onMouseLeave={e => e.currentTarget.style.background = '#fff'}>
-                Talk to sales
-              </button>
+        {/* ── Security ── */}
+        <section ref={securityRef} id="security" className="lp-sec" style={{ background: '#fff' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 48 }}>
+              <SectionLabel>Security &amp; Compliance</SectionLabel>
+              <h2 style={{ fontSize: 'clamp(26px, 2.8vw, 34px)', letterSpacing: '-0.025em', fontWeight: 700, margin: '0 0 12px', color: C.text }}>
+                Built for healthcare-grade trust
+              </h2>
             </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+              <div className="security-item" style={{ opacity: 0 }}><SecurityCard icon={Ic.Upload} title="Encrypted Uploads" desc="All ECG files encrypted in transit via TLS 1.3 and at rest using AES-256. NAFDAC compliant." /></div>
+              <div className="security-item" style={{ opacity: 0 }}><SecurityCard icon={Ic.Database} title="Secure Storage" desc="Single-tenant storage with isolated databases. Data never leaves your configured region." /></div>
+              <div className="security-item" style={{ opacity: 0 }}><SecurityCard icon={Ic.ClipboardCheck} title="Audit Logs" desc="Every view, signature, export, and upload logged with user identity, timestamp, and IP address." /></div>
+              <div className="security-item" style={{ opacity: 0 }}><SecurityCard icon={Ic.Lock} title="Access Control" desc="Role-based access with cardiologist, technician, and admin tiers. MFA and SSO supported." /></div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Patient Management ── */}
+        <section ref={patientsRef} id="patients" aria-labelledby="patients-heading" className="lp-sec">
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ marginBottom: 40 }}>
+              <SectionLabel>Patient Management</SectionLabel>
+              <h2 id="patients-heading" style={{ fontSize: 'clamp(26px, 2.8vw, 34px)', letterSpacing: '-0.025em', fontWeight: 700, margin: '0 0 8px', color: C.text }}>
+                Search, filter, review
+              </h2>
+              <p style={{ fontSize: 14, color: C.text2, margin: 0, maxWidth: 480, lineHeight: 1.6 }}>
+                Manage patients across your department. Every ECG, every report, every note — in one place.
+              </p>
+            </div>
+            <div className="patients-view" style={{ opacity: 0 }}>
+              <PatientTablePreview />
+            </div>
+          </div>
+        </section>
+
+        {/* ── Reports ── */}
+        <section ref={reportsRef} id="reports" aria-labelledby="reports-heading" className="lp-sec" style={{ background: '#fff' }}>
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ marginBottom: 40 }}>
+              <SectionLabel>Clinical Reports</SectionLabel>
+              <h2 id="reports-heading" style={{ fontSize: 'clamp(26px, 2.8vw, 34px)', letterSpacing: '-0.025em', fontWeight: 700, margin: '0 0 8px', color: C.text }}>
+                Professional, structured, signed
+              </h2>
+              <p style={{ fontSize: 14, color: C.text2, margin: 0, maxWidth: 480, lineHeight: 1.6 }}>
+                Each report includes patient summary, measurements, interpretation, and digital signature. Export as PDF or send to your EHR.
+              </p>
+            </div>
+            <div className="reports-view lp-clin-report" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32, alignItems: 'start', opacity: 0 }}>
+              <ClinicalReportPreview />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 8 }}>
+                {[{ label: 'PDF Export', desc: 'Download complete report with hospital branding' }, { label: 'HL7 v2', desc: 'Send structured results to any HMS/EHR' }, { label: 'FHIR R4', desc: 'Standardized observation resources' }].map(d => (
+                  <div key={d.label} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 14, background: C.bg, borderRadius: 10, border: `1px solid ${C.borderSoft}` }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: C.primary50, display: 'grid', placeItems: 'center', color: C.primary }}><Ic.FileText size={15} /></div>
+                    <div><div style={{ fontSize: 13, fontWeight: 600 }}>{d.label}</div><div style={{ fontSize: 11.5, color: C.text2 }}>{d.desc}</div></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Testimonials ── */}
+        <section ref={testimonialsRef} id="testimonials" className="lp-sec">
+          <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: 48 }}>
+              <SectionLabel>From the Field</SectionLabel>
+              <h2 style={{ fontSize: 'clamp(26px, 2.8vw, 34px)', letterSpacing: '-0.025em', fontWeight: 700, margin: '0', color: C.text }}>
+                Trusted by Nigeria&rsquo;s leading cardiology programs
+              </h2>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+              {TESTIMONIALS.map(t => (
+                <div key={t.name} className="testimonial-item" style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.borderSoft}`, padding: 24, boxShadow: C.shadowSm, opacity: 0 }}>
+                  <div style={{ fontSize: 13.5, color: C.text2, lineHeight: 1.65, marginBottom: 16, fontStyle: 'italic' }}>&ldquo;{t.quote}&rdquo;</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <Avatar initials={t.name.split(' ').slice(1).map(x => x[0]).join('').slice(0, 2)} size={32} />
+                    <div><div style={{ fontSize: 13, fontWeight: 600 }}>{t.name}</div><div style={{ fontSize: 11.5, color: C.text2 }}>{t.role}, {t.org}</div></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Bottom CTA ── */}
+        <section style={{ padding: '80px 48px', textAlign: 'center', background: '#fff', borderTop: `1px solid ${C.borderSoft}` }}>
+          <div style={{ maxWidth: 520, margin: '0 auto' }}>
+            <h2 style={{ fontSize: 'clamp(24px, 2.5vw, 32px)', letterSpacing: '-0.02em', fontWeight: 700, margin: '0 0 10px', color: C.text }}>
+              Ready to see CardioEcg in action?
+            </h2>
+            <p style={{ fontSize: 14, color: C.text2, margin: '0 0 28px', lineHeight: 1.6 }}>
+              30-minute walkthrough with your team on a de-identified sample of your hospital&rsquo;s recordings.
+            </p>
+            <button type="button" onClick={() => navigate('login')} style={{
+              padding: '11px 24px', borderRadius: 9, fontSize: 14, fontWeight: 550, fontFamily: 'inherit', border: 'none', cursor: 'pointer', lineHeight: 1,
+              background: C.primary, color: '#fff',
+            }}
+              onMouseEnter={e => e.currentTarget.style.background = C.primary700}
+              onMouseLeave={e => e.currentTarget.style.background = C.primary}>
+              Book a Demo
+            </button>
           </div>
         </section>
       </main>
 
+      {/* ── Footer ── */}
       <footer style={{
-        padding: '32px 48px',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        flexWrap: 'wrap', gap: 12, fontSize: 13, color: '#6B7280',
-        background: '#fff',
+        padding: '40px 48px 32px', background: '#fff', borderTop: `1px solid ${C.borderSoft}`,
+        display: 'flex', flexDirection: 'column', gap: 24,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Ic.Logo size={18} />
-          <span>CardioEcg</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 24, maxWidth: 1100, margin: '0 auto', width: '100%' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <Ic.Logo size={20} />
+              <span style={{ fontWeight: 650, fontSize: 13.5 }}>CardioEcg</span>
+            </div>
+            <div style={{ fontSize: 12, color: C.text2 }}>Lagos, Nigeria</div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, auto)', gap: '32px 48px', fontSize: 12.5 }}>
+            {[
+              { h: 'Product', l: ['Features', 'Workflow', 'Security', 'Pricing'] },
+              { h: 'Resources', l: ['Documentation', 'API Status', 'Compliance', 'Support'] },
+              { h: 'Legal', l: ['Privacy Policy', 'Terms of Service', 'NAFDAC', 'SOC 2'] },
+            ].map(col => (
+              <div key={col.h}>
+                <div style={{ fontWeight: 600, color: C.text, marginBottom: 10, fontSize: 11.5, textTransform: 'uppercase', letterSpacing: '.06em' }}>{col.h}</div>
+                {col.l.map(l => (
+                  <a key={l} href={`/${l.toLowerCase().replace(/ /g, '-')}`} style={{ display: 'block', color: C.text2, textDecoration: 'none', padding: '3px 0', transition: 'color .15s' }}
+                    onMouseEnter={e => e.currentTarget.style.color = C.text}
+                    onMouseLeave={e => e.currentTarget.style.color = C.text2}>{l}</a>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
-        <span>&copy; 2026 Lagos, Nigeria</span>
-        <div style={{ display: 'flex', gap: 20 }}>
-          <a href="/security" style={{ color: '#6B7280', textDecoration: 'none' }}>Security</a>
-          <a href="/nafdac" style={{ color: '#6B7280', textDecoration: 'none' }}>NAFDAC</a>
-          <a href="/privacy" style={{ color: '#6B7280', textDecoration: 'none' }}>Privacy</a>
-          <a href="/terms" style={{ color: '#6B7280', textDecoration: 'none' }}>Terms</a>
+        <div style={{ borderTop: `1px solid ${C.borderSoft}`, paddingTop: 16, fontSize: 11.5, color: C.text3, textAlign: 'center', maxWidth: 1100, margin: '0 auto', width: '100%' }}>
+          &copy; 2026 CardioEcg. All rights reserved.
         </div>
       </footer>
     </div>
