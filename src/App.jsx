@@ -9,17 +9,19 @@ import { Result } from './Result.jsx';
 import { Patients } from './Patients.jsx';
 import { Report } from './Report.jsx';
 import { DesignSystem } from './DesignSystem.jsx';
+import { Settings } from './Settings.jsx';
 
 const PAGES = {
-  landing:     Landing,
-  login:       Login,
-  dashboard:   Dashboard,
-  patients:    Patients,
-  upload:      Upload,
-  queue:       Processing,
-  results:     Result,
-  reports:     Report,
-  designsystem: DesignSystem,
+  landing:       Landing,
+  login:         Login,
+  dashboard:     Dashboard,
+  patients:      Patients,
+  upload:        Upload,
+  queue:         Processing,
+  results:       Result,
+  reports:       Report,
+  designsystem:  DesignSystem,
+  settings:      Settings,
 };
 
 export function App() {
