@@ -42,7 +42,7 @@ export function Upload() {
           actions={<button type="button" className="btn btn-secondary btn-sm"><Ic.RefreshCw size={14} /> Sync from MUSE</button>}
         />
         <main className="content" aria-label="Upload ECG recordings">
-          <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 18 }}>
+          <div className="pg-2col pg-2col-wide">
             <div>
               <h2 className="page-title">Upload ECG recordings</h2>
               <p className="page-sub">
@@ -50,7 +50,6 @@ export function Upload() {
                 Files are validated, de-identified per policy, and queued for analysis.
               </p>
 
-              {/* Drop zone */}
               <div
                 className="dropzone"
                 style={{ padding: '48px 28px', position: 'relative' }}
@@ -73,7 +72,6 @@ export function Upload() {
                 </p>
               </div>
 
-              {/* File list */}
               <div className="card" style={{ marginTop: 18 }}>
                 <div className="card-hd">
                   <div className="card-title">In this batch · 4 files</div>
@@ -125,7 +123,6 @@ export function Upload() {
               </div>
             </div>
 
-            {/* Right column */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div className="card card-pad">
                 <div className="row gap-3" style={{ marginBottom: 10 }}>

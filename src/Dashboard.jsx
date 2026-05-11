@@ -50,8 +50,7 @@ export function Dashboard() {
         <main className="content" aria-label="Dashboard">
 
           {/* ── Stat cards ── */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}
-            role="list" aria-label="Summary statistics">
+          <div className="pg-stat-grid" role="list" aria-label="Summary statistics">
             {STAT_CARDS.map(s => {
               const IconC = Ic[s.icon];
               return (
@@ -85,6 +84,7 @@ export function Dashboard() {
                 View all <Ic.ChevronRight size={12} />
               </button>
             </div>
+            <div className="table-scroll">
             <table className="table" aria-label="Recent ECG uploads">
               <thead>
                 <tr>
@@ -131,6 +131,7 @@ export function Dashboard() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </main>
       </div>
