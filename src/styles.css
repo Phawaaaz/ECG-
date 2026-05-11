@@ -981,3 +981,41 @@ body {
     padding: 12px;
   }
 }
+
+/* ─────────────────────────────────────────
+   8. Responsive page layout utilities
+   ───────────────────────────────────────── */
+
+/* 4-column stat card row */
+.pg-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+/* Side-by-side content + sidebar patterns */
+.pg-2col        { display: grid; gap: 18px; align-items: start; }
+.pg-2col-wide   { grid-template-columns: 1.6fr 1fr; }
+.pg-2col-mid    { grid-template-columns: 1.55fr 1fr; }
+.pg-2col-aside  { grid-template-columns: 1fr 300px; }
+
+/* Horizontal-scroll wrapper for wide tables */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 1024px) {
+  .pg-stat-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 900px) {
+  .pg-2col-wide,
+  .pg-2col-mid,
+  .pg-2col-aside { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .pg-stat-grid { grid-template-columns: 1fr 1fr; }
+}
