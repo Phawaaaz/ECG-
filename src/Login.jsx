@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Icons as Ic } from './Icons.jsx';
+import { useNav } from './NavContext.jsx';
 
 export function Login() {
+  const navigate = useNav();
   const [email, setEmail]       = useState('r.mehta@mercywest.health');
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
@@ -15,8 +17,10 @@ export function Login() {
       return;
     }
     setLoading(true);
-    // Simulate async sign-in (replace with real auth call)
-    setTimeout(() => setLoading(false), 1200);
+    setTimeout(() => {
+      setLoading(false);
+      navigate('dashboard');
+    }, 1200);
   }
 
   return (

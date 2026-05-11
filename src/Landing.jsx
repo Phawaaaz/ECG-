@@ -1,4 +1,5 @@
 import { Icons as Ic } from './Icons.jsx';
+import { useNav } from './NavContext.jsx';
 
 const NAV_LINKS = ['Platform', 'For Hospitals', 'Compliance', 'Pricing'];
 
@@ -30,6 +31,7 @@ const TRUST_LOGOS = ['Mercy Health', 'Northstar Medical', 'St. Aldwyn', 'Pacific
 const FOOTER_LINKS = ['Security', 'HIPAA', 'Privacy', 'Terms', 'Status'];
 
 export function Landing() {
+  const navigate = useNav();
   return (
     <div style={{ background: '#fff', fontFamily: 'Inter, system-ui, sans-serif', color: '#111827' }}>
 
@@ -47,8 +49,8 @@ export function Landing() {
           ))}
         </nav>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 12, alignItems: 'center' }}>
-          <a href="/login" style={{ fontSize: 13, color: '#374151', fontWeight: 500, textDecoration: 'none' }}>Sign in</a>
-          <button type="button" className="btn btn-primary btn-sm">Request demo</button>
+          <button type="button" onClick={() => navigate('login')} style={{ fontSize: 13, color: '#374151', fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: 0 }}>Sign in</button>
+          <button type="button" className="btn btn-primary btn-sm" onClick={() => navigate('login')}>Request demo</button>
         </div>
       </header>
 
