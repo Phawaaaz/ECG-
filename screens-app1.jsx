@@ -1,5 +1,4 @@
 // Dashboard + Upload screens
-const { useState: useState_d } = React;
 
 function Dashboard() {
   const Ic = window.Icons;

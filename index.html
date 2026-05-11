@@ -2,19 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="CardioEcg — AI-assisted clinical ECG analysis platform for hospital cardiology teams." />
+  <meta name="robots" content="noindex" />
   <title>CardioEcg — Clinical ECG Platform</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;550;600;650;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
 
-  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <!-- React 18 production builds -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" integrity="sha384-M2hJFUPxMIbGlMhHhiJELvq8XFMX0bVhIc1G8TmEJsXRYkA0eFmQVfPSfOaR/dz" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" integrity="sha384-nEnMy0BqiOEOqVGjBEzKoHRaYVzAO1cVYBEYqI8NJUNpvKjUFBPaVjnQTMo5FJf" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 </head>
 <body>
   <div id="root"></div>
 
+  <!--
+    Load order matters: each file registers globals on window that the next file depends on.
+    1. design-canvas  — DesignCanvas, DCSection, DCArtboard, DCPostIt
+    2. icons          — window.Icons
+    3. ecg            — window.EcgStrip, EcgMini, EcgMultiLead  (depends on React hooks)
+    4. shell          — window.Sidebar, window.Topbar  (depends on Icons)
+    5. screens-*      — window.Landing … window.Report  (depend on Icons, ECG, Shell)
+    6. design-system  — window.DesignSystem  (depends on Icons, ECG)
+  -->
   <script type="text/babel" src="design-canvas.jsx"></script>
   <script type="text/babel" src="icons.jsx"></script>
   <script type="text/babel" src="ecg.jsx"></script>
@@ -28,8 +42,10 @@
   <script type="text/babel">
     const { DesignCanvas, DCSection, DCArtboard } = window;
 
+    const W = 1440;
+    const H = 900;
+
     function App() {
-      const W = 1440, H = 900;
       return (
         <DesignCanvas>
           <DCSection id="marketing" title="Marketing" subtitle="Landing & sign-in entry points">

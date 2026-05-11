@@ -1,5 +1,4 @@
 // App shell: sidebar + topbar
-const { Icons: I_ } = window;
 
 function Sidebar({ active = 'dashboard', counts = {} }) {
   const Ic = window.Icons;
