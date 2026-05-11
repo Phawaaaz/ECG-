@@ -47,83 +47,6 @@ function Avatar({ initials, size = 28, bg = '#EFF6FF', color = C.primary700 }) {
   return <div style={{ width: size, height: size, borderRadius: '50%', background: bg, color, display: 'grid', placeItems: 'center', fontSize: size * 0.38, fontWeight: 600, flexShrink: 0 }}>{initials}</div>;
 }
 
-/* ── Dashboard Preview Components (no ECG waves) ── */
-
-function UploadPreview() {
-  return (
-    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.borderSoft}`, padding: 18, boxShadow: C.shadowSm, display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontSize: 13, fontWeight: 600 }}>Upload ECG</div>
-        <Badge label="XML · 12-lead" variant="blue" />
-      </div>
-      <div style={{ border: `1.5px dashed ${C.border}`, borderRadius: 10, padding: '24px 16px', textAlign: 'center', background: '#FAFBFC' }}>
-        <Ic.Upload size={20} color={C.text3} />
-        <div style={{ fontSize: 12, color: C.text3, marginTop: 6 }}>Drop files or click to browse</div>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', background: C.bg, borderRadius: 8 }}>
-        <div style={{ width: 28, height: 28, borderRadius: 6, background: C.primary50, display: 'grid', placeItems: 'center' }}><Ic.FileText size={13} color={C.primary} /></div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 12, fontWeight: 600 }}>ecg_12lead_00482.xml</div>
-          <div style={{ fontSize: 10.5, color: C.text3 }}>2.4 MB · 12 leads</div>
-        </div>
-        <Badge label="Uploaded" variant="green" />
-      </div>
-    </div>
-  );
-}
-
-function PatientSummaryPreview() {
-  return (
-    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.borderSoft}`, padding: 18, boxShadow: C.shadowSm, display: 'flex', flexDirection: 'column', gap: 12 }}>
-      <div style={{ fontSize: 13, fontWeight: 600 }}>Patient Summary</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <Avatar initials="EM" size={36} />
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 600 }}>Eleanor Morgan</div>
-          <div style={{ fontSize: 11.5, color: C.text3 }}>MRN: 00482-913 · 64F</div>
-        </div>
-        <Badge label="Review" variant="amber" />
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        {[{ l: 'Heart Rate', v: '72 bpm' }, { l: 'QRS', v: '104 ms' }, { l: 'QTc', v: '428 ms' }, { l: 'Axis', v: '+62°' }].map(d => (
-          <div key={d.l} style={{ background: C.bg, borderRadius: 8, padding: '8px 10px' }}>
-            <div style={{ fontSize: 10.5, color: C.text3, marginBottom: 2 }}>{d.l}</div>
-            <div style={{ fontSize: 13, fontWeight: 600 }}>{d.v}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ReportSummaryPreview() {
-  return (
-    <div style={{ background: '#fff', borderRadius: 12, border: `1px solid ${C.borderSoft}`, padding: 18, boxShadow: C.shadowSm, display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ fontSize: 13, fontWeight: 600 }}>Report · R-2841</div>
-        <Badge label="Final" variant="blue" />
-      </div>
-      <div style={{ display: 'flex', gap: 8 }}>
-        <Avatar initials="DA" size={24} bg={C.primary50} color={C.primary} />
-        <div style={{ fontSize: 12, color: C.text2, lineHeight: 1.5 }}>
-          <span style={{ fontWeight: 600, color: C.text }}>Dr. Adekunle</span> — Normal sinus rhythm. No significant abnormalities detected.
-        </div>
-      </div>
-      <div style={{ fontSize: 10.5, color: C.text3 }}>Signed: Today, 09:14 AM</div>
-    </div>
-  );
-}
-
-function StatusRow() {
-  return (
-    <div style={{ display: 'flex', gap: 8 }}>
-      <Badge label="12 ECGs today" variant="blue" />
-      <Badge label="2 flagged" variant="red" />
-      <Badge label="38s avg" variant="green" />
-    </div>
-  );
-}
-
 function PatientTablePreview() {
   const rows = [
     { name: 'Eleanor Morgan', mrn: '00482-913', time: '09:14', finding: 'Normal sinus rhythm', status: 'review', conf: 97 },
@@ -234,6 +157,7 @@ function SecurityCard({ icon: Icon, title, desc }) {
 export function Landing() {
   const navigate = useNav();
   const [sticky, setSticky] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const heroRef = useRef(null);
   const featuresRef = useRef(null);
   const workflowRef = useRef(null);
@@ -267,22 +191,23 @@ export function Landing() {
         .lp-hdr { padding: 14px 48px; }
         .lp-sec { padding: 96px 48px; }
         .lp-sec-sm { padding: 72px 48px; }
-        .cp { box-sizing: border-box; }
+        .lp-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 6px; color: ${C.text2}; }
+        .lp-mobile-nav { display: none; }
         @media (max-width: 1024px) {
           .lp-hdr { padding: 14px 24px; }
           .lp-sec { padding: 64px 24px; }
           .lp-sec-sm { padding: 48px 24px; }
-          .lp-hero-grid { grid-template-columns: 1fr; gap: 40px; }
-          .lp-hero-right > div { max-width: 100%; }
+          .lp-hero-right { display: none; }
         }
         @media (max-width: 768px) {
           .lp-hdr { padding: 12px 20px; }
           .lp-sec { padding: 48px 20px; }
           .lp-sec-sm { padding: 40px 20px; }
           .lp-nav { display: none; }
-          .lp-hero-grid { gap: 32px; }
+          .lp-hamburger { display: flex; }
           .lp-hero { min-height: 0; padding: 48px 20px 40px; }
           .lp-clin-report { grid-template-columns: 1fr; }
+          .lp-mobile-nav { display: flex; }
         }
         @media (max-width: 480px) {
           .lp-hdr { padding: 10px 16px; }
@@ -311,14 +236,14 @@ export function Landing() {
           ))}
         </nav>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 10, alignItems: 'center' }}>
-          <button type="button" onClick={() => navigate('login')} style={{
+          <button type="button" onClick={() => navigate('login')} className="lp-signin" style={{
             fontSize: 13, color: C.text2, fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: '6px 12px', transition: 'color .15s',
           }}
             onMouseEnter={e => e.currentTarget.style.color = C.text}
             onMouseLeave={e => e.currentTarget.style.color = C.text2}>
             Sign in
           </button>
-          <button type="button" onClick={() => navigate('login')} style={{
+          <button type="button" onClick={() => navigate('login')} className="lp-getstarted" style={{
             padding: '7px 14px', borderRadius: 8, fontSize: 13, fontWeight: 550, fontFamily: 'inherit', border: 'none', cursor: 'pointer', lineHeight: 1,
             background: C.primary, color: '#fff', boxShadow: '0 1px 2px rgba(37,99,235,.2)',
           }}
@@ -326,52 +251,68 @@ export function Landing() {
             onMouseLeave={e => e.currentTarget.style.background = C.primary}>
             Get Started
           </button>
+          <button className="lp-hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="Toggle navigation menu">
+            {menuOpen ? <Ic.X size={20} /> : <div style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: 2 }}><div style={{ width: 18, height: 2, background: 'currentColor', borderRadius: 1 }} /><div style={{ width: 18, height: 2, background: 'currentColor', borderRadius: 1 }} /><div style={{ width: 18, height: 2, background: 'currentColor', borderRadius: 1 }} /></div>}
+          </button>
         </div>
       </header>
 
+      {/* ── Mobile nav overlay ── */}
+      {menuOpen && (
+        <div className="lp-mobile-nav" style={{
+          position: 'fixed', inset: 0, zIndex: 49, background: '#fff',
+          flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10,
+          padding: 24,
+        }}>
+          {NAV_LINKS.map(link => (
+            <a key={link} href={`#${link.toLowerCase()}`} onClick={() => setMenuOpen(false)} style={{
+              fontSize: 22, fontWeight: 550, color: C.text, textDecoration: 'none', padding: '8px 0',
+            }}>{link}</a>
+          ))}
+          <div style={{ height: 1, width: 80, background: C.borderSoft, margin: '12px 0' }} />
+          <button type="button" onClick={() => { setMenuOpen(false); navigate('login'); }} style={{
+            fontSize: 20, fontWeight: 500, color: C.text2, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', padding: '8px 0',
+          }}>Sign in</button>
+          <button type="button" onClick={() => { setMenuOpen(false); navigate('login'); }} style={{
+            marginTop: 8, padding: '14px 36px', borderRadius: 10, fontSize: 18, fontWeight: 550, fontFamily: 'inherit', border: 'none', cursor: 'pointer',
+            background: C.primary, color: '#fff',
+          }}>Get Started</button>
+        </div>
+      )}
+
       <main>
         {/* ── Hero ── */}
-        <section ref={heroRef} aria-labelledby="hero-heading" className="lp-hero" style={{ minHeight: '90vh', display: 'flex', alignItems: 'center', padding: '0 48px' }}>
-          <div className="lp-hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center', maxWidth: 1200, margin: '0 auto', width: '100%' }}>
-            <div>
-              <SectionLabel>CardioEcg Platform</SectionLabel>
-              <h1 id="hero-heading" className="hero-fade" style={{ fontSize: 'clamp(32px, 3.5vw, 44px)', lineHeight: 1.1, letterSpacing: '-0.03em', fontWeight: 700, margin: '0 0 16px', color: C.text }}>
-                AI-Assisted ECG Analysis<br />for Faster Clinical Review
-              </h1>
-              <p className="hero-fade" style={{ fontSize: 15, color: C.text2, lineHeight: 1.65, margin: '0 0 28px', maxWidth: 460 }}>
-                Upload, process, and interpret ECGs in under a minute. Built for hospital cardiology departments — from LUTH to UCH.
-              </p>
-              <div className="hero-fade" style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 28 }}>
-                <button type="button" onClick={() => navigate('login')} style={{
-                  padding: '11px 20px', borderRadius: 9, fontSize: 14, fontWeight: 550, fontFamily: 'inherit', border: 'none', cursor: 'pointer', lineHeight: 1,
-                  background: C.primary, color: '#fff', boxShadow: '0 1px 2px rgba(37,99,235,.25)',
-                }}
-                  onMouseEnter={e => e.currentTarget.style.background = C.primary700}
-                  onMouseLeave={e => e.currentTarget.style.background = C.primary}>
-                  Book a Demo
-                </button>
-                <button type="button" onClick={() => navigate('login')} style={{
-                  padding: '11px 20px', borderRadius: 9, fontSize: 14, fontWeight: 550, fontFamily: 'inherit', cursor: 'pointer', lineHeight: 1,
-                  background: '#fff', color: C.text, border: `1px solid ${C.border}`,
-                }}
-                  onMouseEnter={e => e.currentTarget.style.background = C.bg}
-                  onMouseLeave={e => e.currentTarget.style.background = '#fff'}>
-                  View Sample Report
-                </button>
-              </div>
-              <div className="hero-fade" style={{ display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-                <Badge label="NAFDAC Cleared" variant="green" />
-                <Badge label="NLoN Compliant" variant="blue" />
-                <Badge label="SOC 2 Type II" variant="slate" />
-              </div>
+        <section ref={heroRef} aria-labelledby="hero-heading" className="lp-hero" style={{ minHeight: '90vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 48px' }}>
+          <div style={{ textAlign: 'center', maxWidth: 680, margin: '0 auto' }}>
+            <SectionLabel>CardioEcg Platform</SectionLabel>
+            <h1 id="hero-heading" className="hero-fade" style={{ fontSize: 'clamp(32px, 4vw, 48px)', lineHeight: 1.1, letterSpacing: '-0.03em', fontWeight: 700, margin: '0 0 16px', color: C.text }}>
+              AI-Assisted ECG Analysis<br />for Faster Clinical Review
+            </h1>
+            <p className="hero-fade" style={{ fontSize: 16, color: C.text2, lineHeight: 1.65, margin: '0 auto 28px', maxWidth: 520 }}>
+              Upload, process, and interpret ECGs in under a minute. Built for hospital cardiology departments — from LUTH to UCH.
+            </p>
+            <div className="hero-fade" style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 28 }}>
+              <button type="button" onClick={() => navigate('login')} style={{
+                padding: '11px 22px', borderRadius: 9, fontSize: 14, fontWeight: 550, fontFamily: 'inherit', border: 'none', cursor: 'pointer', lineHeight: 1,
+                background: C.primary, color: '#fff', boxShadow: '0 1px 2px rgba(37,99,235,.25)',
+              }}
+                onMouseEnter={e => e.currentTarget.style.background = C.primary700}
+                onMouseLeave={e => e.currentTarget.style.background = C.primary}>
+                Book a Demo
+              </button>
+              <button type="button" onClick={() => navigate('login')} style={{
+                padding: '11px 22px', borderRadius: 9, fontSize: 14, fontWeight: 550, fontFamily: 'inherit', cursor: 'pointer', lineHeight: 1,
+                background: '#fff', color: C.text, border: `1px solid ${C.border}`,
+              }}
+                onMouseEnter={e => e.currentTarget.style.background = C.bg}
+                onMouseLeave={e => e.currentTarget.style.background = '#fff'}>
+                View Sample Report
+              </button>
             </div>
-            <div className="lp-hero-right" style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 540 }}>
-              <StatusRow />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <UploadPreview />
-                <PatientSummaryPreview />
-              </div>
-              <ReportSummaryPreview />
+            <div className="hero-fade" style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', alignItems: 'center' }}>
+              <Badge label="NAFDAC Cleared" variant="green" />
+              <Badge label="NLoN Compliant" variant="blue" />
+              <Badge label="SOC 2 Type II" variant="slate" />
             </div>
           </div>
         </section>
