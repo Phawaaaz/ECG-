@@ -54,7 +54,7 @@ export function Report() {
           </>}
         />
         <main className="content" style={{ background: '#EEF1F5' }} aria-label="Report export for R-2841">
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 18, alignItems: 'start' }}>
+          <div className="pg-2col pg-2col-aside">
 
             {/* PDF preview */}
             <div style={{ display: 'flex', justifyContent: 'center', minWidth: 0 }}>
