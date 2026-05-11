@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { NavContext } from './NavContext.jsx';
+import { useState, useCallback } from 'react';
+import { NavContext, MobileMenuContext } from './NavContext.jsx';
 import { Landing } from './Landing.jsx';
 import { Login } from './Login.jsx';
 import { Dashboard } from './Dashboard.jsx';
@@ -26,12 +26,26 @@ const PAGES = {
 
 export function App() {
   const [page, setPage] = useState('landing');
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const navigate = useCallback((id) => {
+    setPage(id);
+    setMobileOpen(false);
+  }, []);
+
+  const mobileMenu = {
+    open: mobileOpen,
+    toggle: () => setMobileOpen(v => !v),
+    close: () => setMobileOpen(false),
+  };
 
   const Page = PAGES[page] ?? Dashboard;
 
   return (
-    <NavContext.Provider value={setPage}>
-      <Page onNavigate={setPage} />
+    <NavContext.Provider value={navigate}>
+      <MobileMenuContext.Provider value={mobileMenu}>
+        <Page onNavigate={navigate} />
+      </MobileMenuContext.Provider>
     </NavContext.Provider>
   );
 }

@@ -76,6 +76,7 @@ export const Icons = {
   Pin:            I(<><path d="m12 17 0 5" /><path d="M9 10.76V6a2 2 0 0 1 1.11-1.79l1.78-.9A2 2 0 0 1 12.78 3h0a2 2 0 0 1 .89.31l1.78.9A2 2 0 0 1 16.56 6v4.76a2 2 0 0 0 .59 1.41l1.85 1.85A1 1 0 0 1 18.29 16H5.71a1 1 0 0 1-.71-1.71l1.85-1.85a2 2 0 0 0 .59-1.41Z" /></>),
   Edit:           I(<><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></>),
   Send:           I(<><path d="m22 2-7 20-4-9-9-4z" /><path d="M22 2 11 13" /></>),
+  Menu:           I(<><line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="18" x2="20" y2="18" /></>),
 
   Logo: ({ size = 30 }) => (
     <svg width={size} height={size} viewBox="0 0 30 30" fill="none" aria-label="CardioEcg logo" role="img">
