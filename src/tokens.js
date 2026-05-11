@@ -21,4 +21,5 @@ export const C = {
   borderSoft: '#F1F3F7',
   bg:         '#F7F9FC',
   card:       '#FFFFFF',
+  shadowSm:   '0 1px 2px rgba(16, 24, 40, .04)',
 };
