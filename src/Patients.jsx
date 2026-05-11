@@ -73,7 +73,7 @@ export function Patients() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1.55fr 1fr', gap: 14 }}>
+          <div className="pg-2col pg-2col-mid" style={{ gap: 14 }}>
             {/* Patient table */}
             <div className="card">
               <div className="card-hd" style={{ alignItems: 'center', flexWrap: 'wrap', gap: 8 }}>

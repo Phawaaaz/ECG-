@@ -42,7 +42,7 @@ export function Upload() {
           actions={<button type="button" className="btn btn-secondary btn-sm"><Ic.RefreshCw size={14} /> Sync from MUSE</button>}
         />
         <main className="content" aria-label="Upload ECG recordings">
-          <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 18 }}>
+          <div className="pg-2col pg-2col-wide">
             <div>
               <h2 className="page-title">Upload ECG recordings</h2>
               <p className="page-sub">
